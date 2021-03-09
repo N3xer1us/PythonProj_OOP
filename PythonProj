@@ -1,0 +1,175 @@
+
+class Car:
+
+    available = True
+
+    def __init__(self, carBrand, carModel, carUsage, regNum, priceHour, priceDay, priceWeek):
+        self.carBrand = carBrand
+        self.carModel = carModel
+        self.carUsage = carUsage
+        self.regNum = regNum
+        self.priceHour = priceHour
+        self.priceDay = priceDay
+        self.priceWeek = priceWeek
+
+
+class carOrder:
+
+    def __init__(self, carId, hours, days, weeks):
+        self.carId = carId
+        self.hours = hours
+        self.days = days
+        self.weeks = weeks
+
+
+
+class System:
+
+    carList = {}
+
+    carList[0] = Car("Audi", "A6", 12, 122310, 1, 24, 168)
+    carList[1] = Car("Toyota", "Corrola", 12, 122311, 1, 24, 168)
+    carList[2] = Car("Opel", "Corsa", 12, 122312, 1, 24, 168)
+    carList[3] = Car("Honda", "Civic", 12, 122313, 1, 24, 168)
+    carList[4] = Car("Skoda", "Octavia", 12, 122314, 1, 24, 168)
+    carList[5] = Car("Audi", "A4", 12, 122315, 1, 24, 168)
+    carList[6] = Car("Toyota", "Supra", 12, 122316, 1, 24, 168)
+    carList[7] = Car("Opel", "Astra", 12, 122317, 1, 24, 168)
+    carList[8] = Car("Honda", "Accord", 12, 122318, 1, 24, 168)
+    carList[9] = Car("Skoda", "Fabia", 12, 122319, 1, 24, 168)
+
+    def getAllCars(self):
+        for number in self.carList.keys():
+            print(self.carList.get(number).carBrand + " " + self.carList.get(number).carModel)
+
+    def getCarById(self, id):
+        return self.carList[id]
+
+    def getCarByBrandAndModel(self, carBrand, carModel):
+        for number in self.carList.keys():
+            if self.carList.get(number).carBrand == carBrand and self.carList.get(number).carModel == carModel:
+                print(self.carList.get(number).carBrand + " " + self.carList.get(number).carModel)
+
+    def getCarByBrand(self, carBrand):
+        for number in self.carList.keys():
+            if self.carList.get(number).carBrand == carBrand:
+                print(self.carList.get(number).carBrand + " " + self.carList.get(number).carModel)
+
+    def getAllAvailableCars(self):
+        for number in self.carList.keys():
+            if self.carList.get(number).available:
+                print(self.carList.get(number).carBrand + " " + self.carList.get(number).carModel)
+
+    def setCarsUnavailable(self, list):
+        for number in list.keys():
+            self.carList.get(list[number].carId).available = False;
+
+    def setCarsAvailable(self, list):
+        for number in list.keys():
+            self.carList.get(list[number].carId).available = True;
+
+    def checkOrders(self, list):
+        result = True
+
+        for number in list.keys():
+            if not self.carList.get(list[number].carId).available:
+                result = False
+
+        if result:
+            self.setCarsUnavailable(list)
+
+        return result
+
+    def calculateOrders(self, orders, isDiscounted):
+        result = 0
+
+        for number in orders.keys():
+            car = self.getCarById(orders[number].carId)
+            result = result + orders[number].hours * car.priceHour
+            result = result + orders[number].days * car.priceDay
+            result = result + orders[number].weeks * car.priceWeek
+
+        if isDiscounted:
+            result -= result*0.3
+
+        return result
+
+class Client:
+
+    sys = System()
+    orderNum = 0
+    orders = {}
+
+    def __init__(self):
+        self.orders.clear()
+
+    def showCars(self):
+        self.sys.getAllAvailableCars()
+
+    def searchCars(self, carBrand , carModel):
+        if carModel == "":
+            self.sys.getCarByBrand(carBrand)
+        else:
+            self.sys.getCarByBrandAndModel(carBrand, carModel)
+
+    def rentCar_hours(self, id, hours):
+        self.orders[self.orderNum] = carOrder(id, hours, 0, 0)
+        self.orderNum += 1
+
+    def rentCar_days(self, id, days):
+        self.orders[self.orderNum] = carOrder(id, 0, days, 0)
+        self.orderNum += 1
+
+    def rentCar_weeks(self, id, weeks):
+        self.orders[self.orderNum] = carOrder(id, 0, 0, weeks)
+        self.orderNum += 1
+
+    def placeOrders(self, carList, orderHours, orderDays, orderWeeks):
+        orders = {}
+        for number in carList:
+            orders[number] = carOrder(carList[number], orderHours[number], orderDays[number], orderWeeks[number])
+
+        return orders
+
+    def checkOut(self):
+        result = 0;
+
+        if self.sys.checkOrders(self.orders):
+
+            if len(self.orders) > 3:
+                result = self.sys.calculateOrders(self.orders , True)
+            else:
+                result = self.sys.calculateOrders(self.orders , False)
+
+            return result
+        else:
+            return "There are unavailable cars in your order"
+
+
+
+client1 = Client()
+
+
+client1.rentCar_hours(0, 2)
+client1.rentCar_hours(1, 2)
+client1.rentCar_days(2, 2)
+client1.rentCar_days(3, 2)
+
+print()
+print("Client1: " + str(client1.checkOut()))
+
+client2 = Client()
+
+client2.rentCar_hours(4, 2)
+
+print("Client2: " + str(client2.checkOut()))
+
+print()
+print("Searching for Opel cars: ")
+client1.searchCars("Opel", "")
+print()
+print("Searching for Honda Civic: ")
+client1.searchCars("Honda", "Civic")
+print()
+print("Searching for invalid car: ")
+client1.searchCars("1", "1")
