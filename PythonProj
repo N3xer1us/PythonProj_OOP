@@ -97,11 +97,11 @@ class System:
 class Client:
 
     sys = System()
-    orderNum = 0
-    orders = {}
+
 
     def __init__(self):
-        self.orders.clear()
+        self.orders = {}
+        self.orderNum = 0
 
     def showCars(self):
         self.sys.getAllAvailableCars()
@@ -148,6 +148,7 @@ class Client:
 
 
 client1 = Client()
+client2 = Client()
 
 
 client1.rentCar_hours(0, 2)
@@ -157,8 +158,6 @@ client1.rentCar_days(3, 2)
 
 print()
 print("Client1: " + str(client1.checkOut()))
-
-client2 = Client()
 
 client2.rentCar_hours(4, 2)
 
